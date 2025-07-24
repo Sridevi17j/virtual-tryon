@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Try-On Fashion App - Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .text-gradient {
+            background: linear-gradient(to right, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .btn {
+            @apply px-4 py-2 rounded-md font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2;
+        }
+        .btn-primary {
+            @apply bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500;
+        }
+        .card {
+            @apply bg-white rounded-lg shadow-sm border border-gray-200;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="text-2xl font-bold text-gradient">
+                    VirtualTryOn
+                </div>
+                <nav class="hidden md:flex space-x-8">
+                    <a href="#" class="text-blue-600 bg-blue-50 px-3 py-2 rounded-md text-sm font-medium">Home</a>
+                    <a href="#tryon" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">Try On</a>
+                    <a href="#about" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">About</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="bg-gradient-to-br from-blue-50 to-purple-50 py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <h1 class="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+                    Try On Clothes
+                    <span class="block text-gradient">Virtually</span>
+                </h1>
+                <p class="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+                    Experience the future of online shopping with our AI-powered virtual try-on technology. 
+                    See how clothes fit before you buy, powered by cutting-edge VITON-HD technology.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <button onclick="scrollToTryOn()" class="bg-blue-600 text-white text-lg px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors">
+                        Start Virtual Try-On →
+                    </button>
+                    <button onclick="scrollToAbout()" class="bg-white text-gray-700 border border-gray-300 text-lg px-8 py-3 rounded-lg hover:bg-gray-50 transition-colors">
+                        Learn More
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Try-On Demo Section -->
+    <section id="tryon" class="py-20 bg-white">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                    Virtual Try-On Demo
+                </h2>
+                <p class="text-lg text-gray-600">
+                    Upload your photo and a garment to see how it looks on you
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                <!-- Person Image Upload -->
+                <div class="card p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Your Photo</h3>
+                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                        <input type="file" id="personImage" accept="image/*" class="hidden" onchange="handleImageUpload(this, 'person')">
+                        <label for="personImage" class="cursor-pointer">
+                            <svg class="w-12 h-12 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                            </svg>
+                            <p class="text-gray-600">Click to upload your photo</p>
+                            <p class="text-sm text-gray-400">PNG, JPG, GIF up to 10MB</p>
+                        </label>
+                        <div id="personPreview" class="mt-4 hidden">
+                            <img class="max-w-full h-48 object-cover rounded mx-auto">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Garment Image Upload -->
+                <div class="card p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Garment</h3>
+                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                        <input type="file" id="garmentImage" accept="image/*" class="hidden" onchange="handleImageUpload(this, 'garment')">
+                        <label for="garmentImage" class="cursor-pointer">
+                            <svg class="w-12 h-12 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                            </svg>
+                            <p class="text-gray-600">Click to upload garment</p>
+                            <p class="text-sm text-gray-400">PNG, JPG, GIF up to 10MB</p>
+                        </label>
+                        <div id="garmentPreview" class="mt-4 hidden">
+                            <img class="max-w-full h-48 object-cover rounded mx-auto">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Try-On Button -->
+            <div class="text-center">
+                <button id="tryOnBtn" onclick="startTryOn()" disabled class="bg-gray-400 text-white px-8 py-3 rounded-lg font-semibold cursor-not-allowed">
+                    Upload Both Images First
+                </button>
+            </div>
+
+            <!-- Demo Result -->
+            <div id="result" class="hidden mt-12 card p-8 text-center">
+                <h3 class="text-2xl font-semibold text-gray-900 mb-4">Try-On Result</h3>
+                <div class="bg-gray-100 rounded-lg p-12 mb-6">
+                    <div class="text-gray-500">
+                        <svg class="w-24 h-24 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        <p class="text-lg">Virtual Try-On Result</p>
+                        <p class="text-sm">Demo Mode - In the full app, your AI-processed result would appear here</p>
+                    </div>
+                </div>
+                <div class="flex gap-4 justify-center">
+                    <button class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
+                        Download Result
+                    </button>
+                    <button onclick="resetDemo()" class="bg-white text-gray-700 border border-gray-300 px-6 py-3 rounded-lg hover:bg-gray-50 transition-colors">
+                        Try Another
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-20 bg-gray-50">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+                    About Virtual Try-On
+                </h2>
+                <p class="text-xl text-gray-600">
+                    Revolutionizing online fashion shopping with cutting-edge AI technology
+                </p>
+            </div>
+
+            <div class="card p-8 mb-8">
+                <h3 class="text-2xl font-bold text-gray-900 mb-6">The Technology</h3>
+                <div class="space-y-6">
+                    <div>
+                        <h4 class="text-lg font-semibold text-gray-900 mb-3">VITON-HD</h4>
+                        <p class="text-gray-600 leading-relaxed">
+                            Our virtual try-on system is powered by VITON-HD, a state-of-the-art deep learning model 
+                            specifically designed for realistic clothing transfer. This advanced neural network understands 
+                            human poses, body shapes, and clothing characteristics to generate highly realistic try-on results.
+                        </p>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h5 class="font-medium text-gray-900 mb-2">Key Features:</h5>
+                            <ul class="space-y-1 text-gray-600">
+                                <li>✓ Pose-aware synthesis</li>
+                                <li>✓ High-resolution output</li>
+                                <li>✓ Realistic fitting</li>
+                                <li>✓ Preserves details</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h5 class="font-medium text-gray-900 mb-2">Tech Stack:</h5>
+                            <ul class="space-y-1 text-gray-600">
+                                <li>• React + TypeScript</li>
+                                <li>• FastAPI + Python</li>
+                                <li>• PyTorch + VITON-HD</li>
+                                <li>• Docker + Nginx</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-blue-50 rounded-lg p-6 border border-blue-200">
+                <div class="flex items-start">
+                    <svg class="w-6 h-6 text-blue-600 mt-1 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <div>
+                        <h4 class="text-lg font-semibold text-blue-900 mb-2">Demo Version</h4>
+                        <p class="text-blue-800">
+                            This is a demonstration of the Virtual Try-On app UI. For full AI processing, 
+                            the backend services need to be running with the VITON-HD model loaded. 
+                            The complete codebase is available and ready to deploy!
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="text-center">
+                <div class="text-xl font-bold text-gradient mb-2">VirtualTryOn</div>
+                <p class="text-gray-600 text-sm">
+                    © 2024 Virtual Try-On Fashion App. Built with React, FastAPI, and VITON-HD.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        let personImageUploaded = false;
+        let garmentImageUploaded = false;
+
+        function handleImageUpload(input, type) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                const previewDiv = document.getElementById(type + 'Preview');
+                const img = previewDiv.querySelector('img');
+                
+                reader.onload = function(e) {
+                    img.src = e.target.result;
+                    previewDiv.classList.remove('hidden');
+                    
+                    if (type === 'person') {
+                        personImageUploaded = true;
+                    } else {
+                        garmentImageUploaded = true;
+                    }
+                    
+                    updateTryOnButton();
+                };
+                
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function updateTryOnButton() {
+            const btn = document.getElementById('tryOnBtn');
+            if (personImageUploaded && garmentImageUploaded) {
+                btn.disabled = false;
+                btn.textContent = 'Start Virtual Try-On';
+                btn.className = 'bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors cursor-pointer';
+            }
+        }
+
+        function startTryOn() {
+            if (!personImageUploaded || !garmentImageUploaded) return;
+            
+            const btn = document.getElementById('tryOnBtn');
+            btn.textContent = 'Processing...';
+            btn.disabled = true;
+            btn.className = 'bg-gray-400 text-white px-8 py-3 rounded-lg font-semibold cursor-not-allowed';
+            
+            // Simulate processing
+            setTimeout(() => {
+                document.getElementById('result').classList.remove('hidden');
+                document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
+            }, 2000);
+        }
+
+        function resetDemo() {
+            personImageUploaded = false;
+            garmentImageUploaded = false;
+            document.getElementById('personPreview').classList.add('hidden');
+            document.getElementById('garmentPreview').classList.add('hidden');
+            document.getElementById('result').classList.add('hidden');
+            document.getElementById('personImage').value = '';
+            document.getElementById('garmentImage').value = '';
+            
+            const btn = document.getElementById('tryOnBtn');
+            btn.disabled = true;
+            btn.textContent = 'Upload Both Images First';
+            btn.className = 'bg-gray-400 text-white px-8 py-3 rounded-lg font-semibold cursor-not-allowed';
+        }
+
+        function scrollToTryOn() {
+            document.getElementById('tryon').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function scrollToAbout() {
+            document.getElementById('about').scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
