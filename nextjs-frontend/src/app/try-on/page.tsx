@@ -24,12 +24,16 @@ const TryOnPage: React.FC = () => {
   useEffect(() => {
     const testApiConnection = async () => {
       try {
-        console.log('Testing API connection...');
+        console.log('🔍 USEEFFECT: Testing API connection with apiClient...');
+        console.log('🔍 USEEFFECT: API Base URL:', 'https://backend-api-production-8f2f.up.railway.app/api/v1');
         const healthData = await apiClient.getHealth();
-        console.log('API Health check successful:', healthData);
+        console.log('🔍 USEEFFECT: API Health check successful:', healthData);
         setApiHealthy(true);
       } catch (error) {
-        console.error('API Health check failed:', error);
+        console.error('🔍 USEEFFECT: API Health check failed:');
+        console.error('🔍 USEEFFECT: Error type:', error.constructor.name);
+        console.error('🔍 USEEFFECT: Error message:', error.message);
+        console.error('🔍 USEEFFECT: Full error:', error);
         setApiHealthy(false);
       }
     };
@@ -250,15 +254,24 @@ const TryOnPage: React.FC = () => {
   // Test button to make a simple API call
   const testApiCall = async () => {
     console.log('🧪 TEST: Making simple fetch to health endpoint...');
+    console.log('🧪 TEST: Target URL:', 'https://backend-api-production-8f2f.up.railway.app/health');
+    
     try {
+      console.log('🧪 TEST: Starting fetch request...');
       const response = await fetch('https://backend-api-production-8f2f.up.railway.app/health');
-      console.log('🧪 TEST: Health response:', response.status, response.statusText);
+      console.log('🧪 TEST: Fetch completed, response received');
+      console.log('🧪 TEST: Response status:', response.status, response.statusText);
+      console.log('🧪 TEST: Response headers:', [...response.headers.entries()]);
+      
       const data = await response.json();
-      console.log('🧪 TEST: Health data:', data);
-      alert('Health check successful! Check console for details.');
+      console.log('🧪 TEST: Response data:', data);
+      alert(`Health check successful! Status: ${response.status}`);
     } catch (error) {
-      console.error('🧪 TEST: Health check failed:', error);
-      alert('Health check failed! Check console for details.');
+      console.error('🧪 TEST: Health check failed with error:');
+      console.error('🧪 TEST: Error type:', error.constructor.name);
+      console.error('🧪 TEST: Error message:', error.message);
+      console.error('🧪 TEST: Full error object:', error);
+      alert(`Health check failed! Error: ${error.message}`);
     }
   };
 
