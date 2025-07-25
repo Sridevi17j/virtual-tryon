@@ -42,10 +42,17 @@ api.interceptors.response.use(
 );
 
 export const apiClient = {
-  // Health endpoints
+  // Health endpoints - NOTE: health endpoint is at root, not /api/v1
   async getHealth(): Promise<HealthResponse> {
-    const response: AxiosResponse<HealthResponse> = await api.get('/health');
-    return response.data;
+    // Original API client call (commented out)
+    // const response: AxiosResponse<HealthResponse> = await api.get('/health');
+    
+    // Direct fetch to correct health endpoint
+    const response = await fetch('https://backend-api-production-8f2f.up.railway.app/health');
+    if (!response.ok) {
+      throw new Error(`Health check failed: ${response.status}`);
+    }
+    return await response.json();
   },
 
   // File upload endpoints
