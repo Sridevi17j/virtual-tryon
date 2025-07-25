@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { apiClient } from '../../utils/api';
 
 const TryOnPage: React.FC = () => {
   const router = useRouter();
@@ -88,22 +89,17 @@ const TryOnPage: React.FC = () => {
     setIsProcessing(true);
 
     try {
-      // Create FormData for API call
-      const formData = new FormData();
-      formData.append('person_image', personImage);
-      formData.append('garment_image', garmentImage);
+      // Original hardcoded API calls (commented out)
+      // const formData = new FormData();
+      // formData.append('person_image', personImage);
+      // formData.append('garment_image', garmentImage);
+      // const response = await fetch('http://localhost:8000/api/v1/tryon', {
+      //   method: 'POST',
+      //   body: formData,
+      // });
 
-      // Call backend API
-      const response = await fetch('http://localhost:8000/api/v1/tryon', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
+      // Updated to use apiClient with Railway backend
+      const data = await apiClient.virtualTryOn(personImage, garmentImage, true);
       console.log('Try-on job created:', data);
 
       // Poll for job completion
@@ -113,12 +109,11 @@ const TryOnPage: React.FC = () => {
       while (!jobCompleted) {
         await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second
         
-        const statusResponse = await fetch(`http://localhost:8000/api/v1/jobs/${jobId}`);
-        if (!statusResponse.ok) {
-          throw new Error('Failed to get job status');
-        }
+        // Original hardcoded status check (commented out)
+        // const statusResponse = await fetch(`http://localhost:8000/api/v1/jobs/${jobId}`);
         
-        const jobData = await statusResponse.json();
+        // Updated to use apiClient
+        const jobData = await apiClient.getJobStatus(jobId);
         console.log('Job status:', jobData);
         
         if (jobData.status === 'completed') {
@@ -128,9 +123,13 @@ const TryOnPage: React.FC = () => {
             message: 'Processing completed! Your virtual try-on result is ready.'
           });
           
-          // Set the result image URL
+          // Set the result image URL (using Railway backend URL)
           if (jobData.result_url) {
-            setResultImageUrl(`http://localhost:8000${jobData.result_url}`);
+            // Original localhost URL (commented out)
+            // setResultImageUrl(`http://localhost:8000${jobData.result_url}`);
+            
+            // Updated for Railway backend
+            setResultImageUrl(`https://backend-api-production-8f2f.up.railway.app${jobData.result_url}`);
           }
           
           // Show the result section
