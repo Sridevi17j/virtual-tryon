@@ -77,8 +77,12 @@ const TryOnPage: React.FC = () => {
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+    console.log('Form submitted!'); // Debug log
+    console.log('Person image:', personImage); // Debug log
+    console.log('Garment image:', garmentImage); // Debug log
     
     if (!personImage || !garmentImage) {
+      console.log('Missing images - validation failed'); // Debug log
       addToast({
         type: 'error',
         message: 'Please upload both person and garment images'
@@ -86,6 +90,7 @@ const TryOnPage: React.FC = () => {
       return;
     }
 
+    console.log('Starting processing...'); // Debug log
     setIsProcessing(true);
 
     try {
@@ -99,6 +104,7 @@ const TryOnPage: React.FC = () => {
       // });
 
       // Updated to use apiClient with Railway backend
+      console.log('About to call apiClient.virtualTryOn...'); // Debug log
       const data = await apiClient.virtualTryOn(personImage, garmentImage, true);
       console.log('Try-on job created:', data);
 
@@ -175,6 +181,9 @@ const TryOnPage: React.FC = () => {
   };
 
   const canSubmit = personImage && garmentImage && !isProcessing;
+  
+  // Debug logging for button state
+  console.log('Button state - canSubmit:', canSubmit, 'personImage:', !!personImage, 'garmentImage:', !!garmentImage, 'isProcessing:', isProcessing);
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
