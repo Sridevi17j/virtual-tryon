@@ -12,10 +12,17 @@
 #   status = 200
 #   force = true
 
-# Updated Railway backend redirect
+# Updated Railway backend redirects
 [[redirects]]
   from = "/api/*"
   to = "https://backend-api-production-8f2f.up.railway.app/api/:splat"
+  status = 200
+  force = true
+
+# Health endpoint redirect (health is at root, not /api/v1)
+[[redirects]]
+  from = "/health"
+  to = "https://backend-api-production-8f2f.up.railway.app/health"
   status = 200
   force = true
 

@@ -9,8 +9,11 @@ import {
 // Original local API configuration
 // const API_BASE_URL = process.env.REACT_APP_API_URL || '/api/v1';
 
-// Updated for Railway backend deployment
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://backend-api-production-8f2f.up.railway.app/api/v1';
+// Updated for Railway backend deployment (commented out - using proxy instead)
+// const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://backend-api-production-8f2f.up.railway.app/api/v1';
+
+// Use Netlify proxy to avoid CORS/CSP issues
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '/api/v1';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -42,13 +45,16 @@ api.interceptors.response.use(
 );
 
 export const apiClient = {
-  // Health endpoints - NOTE: health endpoint is at root, not /api/v1
+  // Health endpoints - using Netlify proxy
   async getHealth(): Promise<HealthResponse> {
     // Original API client call (commented out)
     // const response: AxiosResponse<HealthResponse> = await api.get('/health');
     
-    // Direct fetch to correct health endpoint
-    const response = await fetch('https://backend-api-production-8f2f.up.railway.app/health');
+    // Direct fetch to Railway backend (commented out - using proxy instead)
+    // const response = await fetch('https://backend-api-production-8f2f.up.railway.app/health');
+    
+    // Use Netlify proxy for health endpoint
+    const response = await fetch('/health');
     if (!response.ok) {
       throw new Error(`Health check failed: ${response.status}`);
     }

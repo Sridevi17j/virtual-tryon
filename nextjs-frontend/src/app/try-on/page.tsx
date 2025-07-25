@@ -144,11 +144,12 @@ const TryOnPage: React.FC = () => {
         garmentImageSize: garmentImage.size
       });
       
-      console.log('🚀 STEP 3: Making fetch request to Railway...');
+      console.log('🚀 STEP 3: Making fetch request via Netlify proxy...');
       
       let response;
       try {
-        response = await fetch('https://backend-api-production-8f2f.up.railway.app/api/v1/tryon', {
+        // Use Netlify proxy instead of direct Railway URL
+        response = await fetch('/api/v1/tryon', {
           method: 'POST',
           body: formData,
           headers: {
@@ -184,9 +185,9 @@ const TryOnPage: React.FC = () => {
         // Original hardcoded status check (commented out)
         // const statusResponse = await fetch(`http://localhost:8000/api/v1/jobs/${jobId}`);
         
-        // Updated to use direct fetch for debugging
+        // Updated to use Netlify proxy for job status
         console.log('Checking job status for:', jobId);
-        const statusResponse = await fetch(`https://backend-api-production-8f2f.up.railway.app/api/v1/jobs/${jobId}`);
+        const statusResponse = await fetch(`/api/v1/jobs/${jobId}`);
         if (!statusResponse.ok) {
           throw new Error('Failed to get job status');
         }
@@ -205,8 +206,8 @@ const TryOnPage: React.FC = () => {
             // Original localhost URL (commented out)
             // setResultImageUrl(`http://localhost:8000${jobData.result_url}`);
             
-            // Updated for Railway backend
-            setResultImageUrl(`https://backend-api-production-8f2f.up.railway.app${jobData.result_url}`);
+            // Updated to use proxy for result images too
+            setResultImageUrl(`${jobData.result_url}`);
           }
           
           // Show the result section
@@ -253,12 +254,12 @@ const TryOnPage: React.FC = () => {
 
   // Test button to make a simple API call
   const testApiCall = async () => {
-    console.log('🧪 TEST: Making simple fetch to health endpoint...');
-    console.log('🧪 TEST: Target URL:', 'https://backend-api-production-8f2f.up.railway.app/health');
+    console.log('🧪 TEST: Making simple fetch to health endpoint via proxy...');
+    console.log('🧪 TEST: Target URL:', '/health');
     
     try {
       console.log('🧪 TEST: Starting fetch request...');
-      const response = await fetch('https://backend-api-production-8f2f.up.railway.app/health');
+      const response = await fetch('/health');
       console.log('🧪 TEST: Fetch completed, response received');
       console.log('🧪 TEST: Response status:', response.status, response.statusText);
       console.log('🧪 TEST: Response headers:', [...response.headers.entries()]);
