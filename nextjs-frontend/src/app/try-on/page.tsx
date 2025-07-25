@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiClient } from '../../utils/api';
 
@@ -13,11 +13,29 @@ const TryOnPage: React.FC = () => {
   const [garmentPreview, setGarmentPreview] = useState<string | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [resultImageUrl, setResultImageUrl] = useState<string | null>(null);
+  const [apiHealthy, setApiHealthy] = useState<boolean | null>(null);
 
   const addToast = (toast: { type: string; message: string }) => {
     // Simple alert for now, can be replaced with proper toast component
     alert(toast.message);
   };
+
+  // Test API connection on component load
+  useEffect(() => {
+    const testApiConnection = async () => {
+      try {
+        console.log('Testing API connection...');
+        const healthData = await apiClient.getHealth();
+        console.log('API Health check successful:', healthData);
+        setApiHealthy(true);
+      } catch (error) {
+        console.error('API Health check failed:', error);
+        setApiHealthy(false);
+      }
+    };
+    
+    testApiConnection();
+  }, []);
 
   const handlePersonImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -196,6 +214,25 @@ const TryOnPage: React.FC = () => {
           <p className="text-lg text-gray-600">
             Upload your photo and a garment to see how it looks on you
           </p>
+          
+          {/* API Status Indicator */}
+          <div className="mt-4">
+            {apiHealthy === null && (
+              <div className="text-sm text-gray-500">
+                🔍 Checking API connection...
+              </div>
+            )}
+            {apiHealthy === true && (
+              <div className="text-sm text-green-600">
+                ✅ API connection healthy
+              </div>
+            )}
+            {apiHealthy === false && (
+              <div className="text-sm text-red-600">
+                ❌ API connection failed - check console for details
+              </div>
+            )}
+          </div>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-8">
