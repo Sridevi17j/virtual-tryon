@@ -29,5 +29,5 @@
     # Original restrictive CSP (commented out)
     # Content-Security-Policy = "default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'"
     
-    # Updated CSP to allow Railway backend connections
-    Content-Security-Policy = "default-src 'self' https://backend-api-production-8f2f.up.railway.app; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://backend-api-production-8f2f.up.railway.app"
+    # Temporarily disable CSP for testing
+    # Content-Security-Policy = "default-src 'self' https://backend-api-production-8f2f.up.railway.app https:; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://backend-api-production-8f2f.up.railway.app https: wss: ws:; font-src 'self' https:"
