@@ -127,30 +127,48 @@ const TryOnPage: React.FC = () => {
       // console.log('Try-on job created:', data);
 
       // Direct fetch call for debugging
-      console.log('About to make direct fetch call...'); // Debug log
+      console.log('🚀 STEP 1: About to make direct fetch call...'); // Debug log
+      
       const formData = new FormData();
       formData.append('person_image', personImage);
       formData.append('garment_image', garmentImage);
       
-      console.log('FormData created, making request to Railway...'); // Debug log
-      const response = await fetch('https://backend-api-production-8f2f.up.railway.app/api/v1/tryon', {
-        method: 'POST',
-        body: formData,
-        headers: {
-          // Don't set Content-Type for FormData, let browser handle it
-        }
+      console.log('🚀 STEP 2: FormData created with:', {
+        personImageName: personImage.name,
+        personImageSize: personImage.size,
+        garmentImageName: garmentImage.name,
+        garmentImageSize: garmentImage.size
       });
       
-      console.log('Response received:', response.status, response.statusText); // Debug log
+      console.log('🚀 STEP 3: Making fetch request to Railway...');
       
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('API Error:', errorText);
-        throw new Error(`HTTP error! status: ${response.status}`);
+      let response;
+      try {
+        response = await fetch('https://backend-api-production-8f2f.up.railway.app/api/v1/tryon', {
+          method: 'POST',
+          body: formData,
+          headers: {
+            // Don't set Content-Type for FormData, let browser handle it
+          }
+        });
+        console.log('🚀 STEP 4: Fetch completed successfully, response received:', response.status, response.statusText);
+      } catch (fetchError) {
+        console.error('🚨 FETCH ERROR - Request never reached server:', fetchError);
+        throw fetchError;
       }
       
+      console.log('🚀 STEP 5: Checking response status...');
+      
+      if (!response.ok) {
+        console.log('🚨 Response not OK, getting error details...');
+        const errorText = await response.text();
+        console.error('🚨 API Error Response:', errorText);
+        throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`);
+      }
+      
+      console.log('🚀 STEP 6: Parsing JSON response...');
       const data = await response.json();
-      console.log('Try-on job created:', data);
+      console.log('🚀 STEP 7: Try-on job created successfully:', data);
 
       // Poll for job completion
       const jobId = data.job_id;
@@ -229,6 +247,21 @@ const TryOnPage: React.FC = () => {
     if (garmentInput) garmentInput.value = '';
   };
 
+  // Test button to make a simple API call
+  const testApiCall = async () => {
+    console.log('🧪 TEST: Making simple fetch to health endpoint...');
+    try {
+      const response = await fetch('https://backend-api-production-8f2f.up.railway.app/health');
+      console.log('🧪 TEST: Health response:', response.status, response.statusText);
+      const data = await response.json();
+      console.log('🧪 TEST: Health data:', data);
+      alert('Health check successful! Check console for details.');
+    } catch (error) {
+      console.error('🧪 TEST: Health check failed:', error);
+      alert('Health check failed! Check console for details.');
+    }
+  };
+
   const canSubmit = personImage && garmentImage && !isProcessing;
   
   // Debug logging for button state
@@ -263,6 +296,17 @@ const TryOnPage: React.FC = () => {
                 ❌ API connection failed - check console for details
               </div>
             )}
+          </div>
+          
+          {/* Debug Test Button */}
+          <div className="mt-4">
+            <button
+              type="button"
+              onClick={testApiCall}
+              className="bg-yellow-500 text-white px-4 py-2 rounded text-sm hover:bg-yellow-600"
+            >
+              🧪 Test API Connection
+            </button>
           </div>
         </div>
 
