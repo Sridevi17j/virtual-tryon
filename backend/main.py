@@ -25,9 +25,19 @@ app = FastAPI(
 )
 
 # Add CORS middleware
+# Original local development origins (commented out)
+# app.add_middleware(
+#     CORSMiddleware,
+#     allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+#     allow_credentials=True,
+#     allow_methods=["*"],
+#     allow_headers=["*"],
+# )
+
+# Updated CORS for production (allows Netlify and other domains)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+    allow_origins=["*"],  # Allow all origins for now - can be restricted to specific Netlify domain later
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -38,6 +48,8 @@ app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 app.mount("/results", StaticFiles(directory="results"), name="results")
 
 # Configuration
+KLING_OFFICIAL_SERVICE_URL = "http://127.0.0.1:8004"  # Official Kling AI API service
+KOLORS_SERVICE_URL = "http://127.0.0.1:8003"  # Kolors service using working API
 ENHANCED_ML_SERVICE_URL = "http://127.0.0.1:8001"  # Enhanced ML service with API fallbacks
 
 # In-memory storage for demo
@@ -97,6 +109,146 @@ def create_demo_result(job_id: str):
         
     except Exception as e:
         print(f"Error creating demo result: {e}")
+        raise e
+
+async def process_with_kling_official_service(job_id: str):
+    """Process virtual try-on using the Official Kling AI service"""
+    try:
+        # Find the uploaded images for this job
+        person_files = glob.glob(f"uploads/{job_id}_person_*")
+        garment_files = glob.glob(f"uploads/{job_id}_garment_*")
+        
+        if not person_files or not garment_files:
+            raise Exception("Could not find uploaded images")
+        
+        # Prepare files for Official Kling AI service
+        person_file_path = person_files[0]
+        garment_file_path = garment_files[0]
+        
+        async with httpx.AsyncClient(timeout=300.0) as client:  # Long timeout for Kling processing
+            # Check if Official Kling AI service is available
+            try:
+                health_response = await client.get(f"{KLING_OFFICIAL_SERVICE_URL}/health")
+                if health_response.status_code != 200:
+                    raise Exception("Official Kling AI service is not healthy")
+                
+                health_data = health_response.json()
+                if health_data.get("config") != "configured":
+                    raise Exception("Kling AI API not configured")
+                    
+            except httpx.RequestError:
+                raise Exception("Official Kling AI service is not available")
+            
+            # Prepare files for upload to Official Kling AI service
+            with open(person_file_path, "rb") as person_file, open(garment_file_path, "rb") as garment_file:
+                files = {
+                    "person_image": (os.path.basename(person_file_path), person_file, "image/jpeg"),
+                    "garment_image": (os.path.basename(garment_file_path), garment_file, "image/jpeg")
+                }
+                
+                data = {
+                    "job_id": job_id,
+                    "model_name": "kolors-virtual-try-on-v1-5"
+                }
+                
+                # Call Official Kling AI service
+                response = await client.post(
+                    f"{KLING_OFFICIAL_SERVICE_URL}/process-tryon",
+                    files=files,
+                    data=data
+                )
+            
+            if response.status_code != 200:
+                raise Exception(f"Official Kling AI service error: {response.status_code}")
+            
+            result = response.json()
+            
+            if result["status"] == "completed":
+                # Download the result image from Official Kling AI service
+                result_response = await client.get(f"{KLING_OFFICIAL_SERVICE_URL}{result['result_url']}")
+                if result_response.status_code == 200:
+                    # Save the result locally
+                    local_result_path = f"results/{job_id}_result.jpg"
+                    with open(local_result_path, "wb") as f:
+                        f.write(result_response.content)
+                    return local_result_path, result.get("message", "Official Kling AI processing completed")
+                else:
+                    raise Exception("Failed to download result from Official Kling AI service")
+            else:
+                raise Exception(result.get("message", "Official Kling AI processing failed"))
+                
+    except Exception as e:
+        print(f"Error processing with Official Kling AI service: {e}")
+        raise e
+
+async def process_with_kolors_service(job_id: str):
+    """Process virtual try-on using the Kolors service with working API"""
+    try:
+        # Find the uploaded images for this job
+        person_files = glob.glob(f"uploads/{job_id}_person_*")
+        garment_files = glob.glob(f"uploads/{job_id}_garment_*")
+        
+        if not person_files or not garment_files:
+            raise Exception("Could not find uploaded images")
+        
+        # Prepare files for Kolors service
+        person_file_path = person_files[0]
+        garment_file_path = garment_files[0]
+        
+        async with httpx.AsyncClient(timeout=180.0) as client:  # Long timeout for Kolors processing
+            # Check if Kolors service is available
+            try:
+                health_response = await client.get(f"{KOLORS_SERVICE_URL}/health")
+                if health_response.status_code != 200:
+                    raise Exception("Kolors service is not healthy")
+                
+                health_data = health_response.json()
+                if health_data.get("config") != "configured":
+                    raise Exception("Kolors API not configured")
+                    
+            except httpx.RequestError:
+                raise Exception("Kolors service is not available")
+            
+            # Prepare files for upload to Kolors service
+            with open(person_file_path, "rb") as person_file, open(garment_file_path, "rb") as garment_file:
+                files = {
+                    "person_image": (os.path.basename(person_file_path), person_file, "image/jpeg"),
+                    "garment_image": (os.path.basename(garment_file_path), garment_file, "image/jpeg")
+                }
+                
+                data = {
+                    "job_id": job_id,
+                    "randomize_seed": "true"
+                }
+                
+                # Call Kolors service
+                response = await client.post(
+                    f"{KOLORS_SERVICE_URL}/process-tryon",
+                    files=files,
+                    data=data
+                )
+            
+            if response.status_code != 200:
+                raise Exception(f"Kolors service error: {response.status_code}")
+            
+            result = response.json()
+            
+            if result["status"] == "completed":
+                # Download the result image from Kolors service
+                result_response = await client.get(f"{KOLORS_SERVICE_URL}{result['result_url']}")
+                if result_response.status_code == 200:
+                    # Save the result locally
+                    local_result_path = f"results/{job_id}_result.jpg"
+                    with open(local_result_path, "wb") as f:
+                        f.write(result_response.content)
+                    return local_result_path, result.get("message", "Kolors processing completed")
+                else:
+                    raise Exception("Failed to download result from Kolors service")
+            else:
+                raise Exception(result.get("message", "Kolors processing failed"))
+                
+    except Exception as e:
+        print(f"Error processing with Kolors service: {e}")
         raise e
 
 async def process_with_enhanced_ml_service(job_id: str):
@@ -246,32 +398,58 @@ async def get_job_status(job_id: str):
     # Process job after 2 seconds delay (to allow for uploads to complete)
     if job.status == "processing" and time.time() - job.created_at > 2:
         try:
-            print(f"Processing job {job_id} with Enhanced ML service...")
-            # Try Enhanced ML service first (with API fallbacks)
-            result_path, service_message = await process_with_enhanced_ml_service(job_id)
+            print(f"Processing job {job_id} with Official Kling AI service...")
+            # Try Official Kling AI service first (official API)
+            result_path, service_message = await process_with_kling_official_service(job_id)
             job.status = "completed"
             job.message = service_message
             job.completed_at = time.time()
             job.result_url = f"/results/{job_id}_result.jpg"
-            print(f"Enhanced ML service processing completed for job {job_id}")
+            print(f"Official Kling AI service processing completed for job {job_id}")
             
-        except Exception as ml_error:
-            print(f"Enhanced ML service failed for job {job_id}: {ml_error}")
-            print("Falling back to basic demo processing...")
+        except Exception as kling_error:
+            print(f"Official Kling AI service failed for job {job_id}: {kling_error}")
+            print("Falling back to Kolors service...")
             
-            # Fallback to basic demo processing
+            # Fallback to Kolors service
             try:
-                create_demo_result(job_id)
+                result_path, service_message = await process_with_kolors_service(job_id)
                 job.status = "completed"
-                job.message = "Virtual try-on completed with basic demo processing (Enhanced ML service unavailable)"
+                job.message = f"Fallback: {service_message}"
                 job.completed_at = time.time()
                 job.result_url = f"/results/{job_id}_result.jpg"
-                print(f"Basic demo processing completed for job {job_id}")
+                print(f"Kolors service fallback completed for job {job_id}")
                 
-            except Exception as demo_error:
-                job.status = "failed"
-                job.message = f"Both Enhanced ML and demo processing failed: {str(demo_error)}"
-                print(f"All processing failed for job {job_id}: {demo_error}")
+            except Exception as kolors_error:
+                print(f"Kolors service also failed for job {job_id}: {kolors_error}")
+                print("Falling back to enhanced ML service...")
+                
+                # Fallback to enhanced ML service
+                try:
+                    result_path, service_message = await process_with_enhanced_ml_service(job_id)
+                    job.status = "completed"
+                    job.message = f"Fallback: {service_message}"
+                    job.completed_at = time.time()
+                    job.result_url = f"/results/{job_id}_result.jpg"
+                    print(f"Enhanced ML service fallback completed for job {job_id}")
+                    
+                except Exception as ml_error:
+                    print(f"Enhanced ML service also failed for job {job_id}: {ml_error}")
+                    print("Falling back to basic demo processing...")
+                    
+                    # Final fallback to basic demo processing
+                    try:
+                        create_demo_result(job_id)
+                        job.status = "completed"
+                        job.message = "Virtual try-on completed with basic demo processing (all AI services unavailable)"
+                        job.completed_at = time.time()
+                        job.result_url = f"/results/{job_id}_result.jpg"
+                        print(f"Basic demo processing completed for job {job_id}")
+                        
+                    except Exception as demo_error:
+                        job.status = "failed"
+                        job.message = f"All processing methods failed: {str(demo_error)}"
+                        print(f"All processing failed for job {job_id}: {demo_error}")
     
     return job.dict()
 

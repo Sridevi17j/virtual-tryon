@@ -1,13 +1,16 @@
 import axios, { AxiosResponse } from 'axios';
 import { 
-  TryOnRequest, 
   TryOnResponse, 
   FileUploadResponse, 
   JobInfo, 
   HealthResponse 
 } from '../types';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || '/api/v1';
+// Original local API configuration
+// const API_BASE_URL = process.env.REACT_APP_API_URL || '/api/v1';
+
+// Updated for Railway backend deployment
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://backend-api-production-8f2f.up.railway.app/api/v1';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
