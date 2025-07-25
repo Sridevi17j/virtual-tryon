@@ -121,9 +121,35 @@ const TryOnPage: React.FC = () => {
       //   body: formData,
       // });
 
-      // Updated to use apiClient with Railway backend
-      console.log('About to call apiClient.virtualTryOn...'); // Debug log
-      const data = await apiClient.virtualTryOn(personImage, garmentImage, true);
+      // Updated to use apiClient with Railway backend (commented out for debugging)
+      // console.log('About to call apiClient.virtualTryOn...'); // Debug log
+      // const data = await apiClient.virtualTryOn(personImage, garmentImage, true);
+      // console.log('Try-on job created:', data);
+
+      // Direct fetch call for debugging
+      console.log('About to make direct fetch call...'); // Debug log
+      const formData = new FormData();
+      formData.append('person_image', personImage);
+      formData.append('garment_image', garmentImage);
+      
+      console.log('FormData created, making request to Railway...'); // Debug log
+      const response = await fetch('https://backend-api-production-8f2f.up.railway.app/api/v1/tryon', {
+        method: 'POST',
+        body: formData,
+        headers: {
+          // Don't set Content-Type for FormData, let browser handle it
+        }
+      });
+      
+      console.log('Response received:', response.status, response.statusText); // Debug log
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('API Error:', errorText);
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
       console.log('Try-on job created:', data);
 
       // Poll for job completion
@@ -136,8 +162,13 @@ const TryOnPage: React.FC = () => {
         // Original hardcoded status check (commented out)
         // const statusResponse = await fetch(`http://localhost:8000/api/v1/jobs/${jobId}`);
         
-        // Updated to use apiClient
-        const jobData = await apiClient.getJobStatus(jobId);
+        // Updated to use direct fetch for debugging
+        console.log('Checking job status for:', jobId);
+        const statusResponse = await fetch(`https://backend-api-production-8f2f.up.railway.app/api/v1/jobs/${jobId}`);
+        if (!statusResponse.ok) {
+          throw new Error('Failed to get job status');
+        }
+        const jobData = await statusResponse.json();
         console.log('Job status:', jobData);
         
         if (jobData.status === 'completed') {
