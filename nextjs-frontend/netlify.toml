@@ -36,5 +36,5 @@
     # Original restrictive CSP (commented out)
     # Content-Security-Policy = "default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'"
     
-    # Very permissive CSP for testing - allows all HTTPS connections
-    Content-Security-Policy = "default-src 'self' https: data:; connect-src 'self' https: wss: ws:; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; font-src 'self' https:"
+    # Completely remove CSP to test
+    # Content-Security-Policy = "default-src 'self' https: data:; connect-src 'self' https: wss: ws:; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; font-src 'self' https:"
