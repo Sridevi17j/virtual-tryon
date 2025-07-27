@@ -31,8 +31,8 @@ const TryOnPage: React.FC = () => {
         setApiHealthy(true);
       } catch (error) {
         console.error('🔍 USEEFFECT: API Health check failed:');
-        console.error('🔍 USEEFFECT: Error type:', error.constructor.name);
-        console.error('🔍 USEEFFECT: Error message:', error.message);
+        console.error('🔍 USEEFFECT: Error type:', error instanceof Error ? error.constructor.name : typeof error);
+        console.error('🔍 USEEFFECT: Error message:', error instanceof Error ? error.message : String(error));
         console.error('🔍 USEEFFECT: Full error:', error);
         setApiHealthy(false);
       }
@@ -269,10 +269,10 @@ const TryOnPage: React.FC = () => {
       alert(`Health check successful! Status: ${response.status}`);
     } catch (error) {
       console.error('🧪 TEST: Health check failed with error:');
-      console.error('🧪 TEST: Error type:', error.constructor.name);
-      console.error('🧪 TEST: Error message:', error.message);
+      console.error('🧪 TEST: Error type:', error instanceof Error ? error.constructor.name : typeof error);
+      console.error('🧪 TEST: Error message:', error instanceof Error ? error.message : String(error));
       console.error('🧪 TEST: Full error object:', error);
-      alert(`Health check failed! Error: ${error.message}`);
+      alert(`Health check failed! Error: ${error instanceof Error ? error.message : String(error)}`);
     }
   };
 
