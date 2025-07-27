@@ -26,6 +26,20 @@
   status = 200
   force = true
 
+# Results images redirect (for generated try-on images)
+[[redirects]]
+  from = "/results/*"
+  to = "https://backend-api-production-8f2f.up.railway.app/results/:splat"
+  status = 200
+  force = true
+
+# Uploads images redirect (for uploaded images)
+[[redirects]]
+  from = "/uploads/*"
+  to = "https://backend-api-production-8f2f.up.railway.app/uploads/:splat"
+  status = 200
+  force = true
+
 [[headers]]
   for = "/*"
   [headers.values]
