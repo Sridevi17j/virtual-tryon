@@ -25,7 +25,8 @@ const TryOnPage: React.FC = () => {
     const testApiConnection = async () => {
       try {
         console.log('🔍 USEEFFECT: Testing API connection with apiClient...');
-        console.log('🔍 USEEFFECT: API Base URL:', 'https://backend-api-production-8f2f.up.railway.app/api/v1');
+        console.log('🔍 USEEFFECT: API Base URL:', process.env.NEXT_PUBLIC_API_URL);
+        console.log('🔍 USEEFFECT: API Root URL:', process.env.NEXT_PUBLIC_API_ROOT_URL);
         const healthData = await apiClient.getHealth();
         console.log('🔍 USEEFFECT: API Health check successful:', healthData);
         setApiHealthy(true);
@@ -254,19 +255,12 @@ const TryOnPage: React.FC = () => {
 
   // Test button to make a simple API call
   const testApiCall = async () => {
-    console.log('🧪 TEST: Making simple fetch to health endpoint via proxy...');
-    console.log('🧪 TEST: Target URL:', '/health');
+    console.log('🧪 TEST: Making health check via apiClient...');
     
     try {
-      console.log('🧪 TEST: Starting fetch request...');
-      const response = await fetch('/health');
-      console.log('🧪 TEST: Fetch completed, response received');
-      console.log('🧪 TEST: Response status:', response.status, response.statusText);
-      console.log('🧪 TEST: Response headers:', [...response.headers.entries()]);
-      
-      const data = await response.json();
+      const data = await apiClient.getHealth();
       console.log('🧪 TEST: Response data:', data);
-      alert(`Health check successful! Status: ${response.status}`);
+      alert('Health check successful!');
     } catch (error) {
       console.error('🧪 TEST: Health check failed with error:');
       console.error('🧪 TEST: Error type:', error instanceof Error ? error.constructor.name : typeof error);
@@ -341,7 +335,10 @@ const TryOnPage: React.FC = () => {
                   className="hidden"
                   disabled={isProcessing}
                 />
-                <label htmlFor="personImage" className="cursor-pointer">
+                <label
+                  htmlFor="personImage"
+                  className="cursor-pointer"
+                >
                   {personPreview ? (
                     <div className="space-y-4">
                       <img
@@ -378,7 +375,10 @@ const TryOnPage: React.FC = () => {
                   className="hidden"
                   disabled={isProcessing}
                 />
-                <label htmlFor="garmentImage" className="cursor-pointer">
+                <label
+                  htmlFor="garmentImage"
+                  className="cursor-pointer"
+                >
                   {garmentPreview ? (
                     <div className="space-y-4">
                       <img
