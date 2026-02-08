@@ -51,7 +51,7 @@ export interface UploadedImage {
 
 export interface HealthResponse {
   status: string;
-  services: Record<string, any>;
+  services: Record<string, unknown>;
   timestamp: string;
 }
 
