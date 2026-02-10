@@ -9,10 +9,10 @@ const Footer: React.FC = () => {
           {/* Brand */}
           <div>
             <div className="text-xl font-bold text-blue-600 mb-2">
-              VirtualTryOn
+              Virtual Try-On
             </div>
             <p className="text-gray-600 text-sm">
-              Experience the future of online fashion shopping with AI-powered virtual try-on technology.
+              AI-powered virtual try-on for a faster, more confident fit check.
             </p>
           </div>
 
@@ -22,7 +22,7 @@ const Footer: React.FC = () => {
             <ul className="space-y-2 text-sm">
               <li>
                 <Link href="/try-on" className="text-gray-600 hover:text-blue-600 transition-colors">
-                  Try On
+                  Try-On
                 </Link>
               </li>
               <li>
