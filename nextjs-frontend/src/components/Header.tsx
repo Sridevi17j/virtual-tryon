@@ -9,7 +9,7 @@ const Header: React.FC = () => {
 
   const navigation = [
     { name: 'Home', href: '/' },
-    { name: 'Try On', href: '/try-on' },
+    { name: 'Try-On', href: '/try-on' },
     { name: 'About', href: '/about' },
   ];
 
@@ -20,7 +20,7 @@ const Header: React.FC = () => {
           {/* Logo */}
           <Link href="/" className="flex items-center">
             <div className="text-2xl font-bold text-blue-600">
-              VirtualTryOn
+              Virtual Try-On
             </div>
           </Link>
 
