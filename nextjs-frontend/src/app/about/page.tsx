@@ -134,7 +134,7 @@ const AboutPage: React.FC = () => {
               href="/try-on"
               className="inline-flex items-center bg-blue-600 text-white font-semibold px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors"
             >
-              Try It Now →
+              Start Try-On →
             </Link>
           </div>
         </div>
